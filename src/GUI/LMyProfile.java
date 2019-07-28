@@ -75,11 +75,6 @@ public class LMyProfile extends javax.swing.JFrame {
                     editButton.setEnabled(true);
                     cancelButton.setText("Delete Consultation");
                 }
-                else
-                {
-                    editButton.setEnabled(false);
-                    cancelButton.setText("Delete Consultation");
-                }
             }
         });
         x = userlist.getLecturerObject(un);
@@ -295,7 +290,7 @@ public class LMyProfile extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(definedConsTable);
 
-        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Available", "Booked", "Overdue" }));
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Available", "Booked" }));
         statusComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statusComboBoxActionPerformed(evt);
@@ -779,25 +774,6 @@ public class LMyProfile extends javax.swing.JFrame {
                     }
                 }  
             }
-            else{
-                for (int i = 0; i < chlist.size(); i++){
-                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue")){
-                       Vector row = new Vector();
-                       row.add(chlist.get(i).returnDate());
-                       row.add(chlist.get(i).returnFromTime());
-                       row.add(chlist.get(i).returnToTime());
-                       row.add(chlist.get(i).returnVenue());
-                       row.add(chlist.get(i).returnStatus());
-                       row.add(chlist.get(i).returnStudentID());
-                       row.add(chlist.get(i).returnStudentName());
-                       row.add(chlist.get(i).returnStudentEmail());
-                       row.add(chlist.get(i).returnDegLevel());
-                       row.add(chlist.get(i).returnCourse());
-                       row.add(chlist.get(i).returnContact());
-                       model.addRow(row);
-                    }
-                }  
-            }
         }
         else if (scat == 1){
             if (cstatus == 0){
@@ -841,25 +817,6 @@ public class LMyProfile extends javax.swing.JFrame {
             else if (cstatus == 2){
                 for (int i = 0; i < chlist.size(); i++){
                     if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
-                       Vector row = new Vector();
-                       row.add(chlist.get(i).returnDate());
-                       row.add(chlist.get(i).returnFromTime());
-                       row.add(chlist.get(i).returnToTime());
-                       row.add(chlist.get(i).returnVenue());
-                       row.add(chlist.get(i).returnStatus());
-                       row.add(chlist.get(i).returnStudentID());
-                       row.add(chlist.get(i).returnStudentName());
-                       row.add(chlist.get(i).returnStudentEmail());
-                       row.add(chlist.get(i).returnDegLevel());
-                       row.add(chlist.get(i).returnCourse());
-                       row.add(chlist.get(i).returnContact());
-                       model.addRow(row);
-                    }
-                }  
-            }
-            else{
-                for (int i = 0; i < chlist.size(); i++){
-                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
                        Vector row = new Vector();
                        row.add(chlist.get(i).returnDate());
                        row.add(chlist.get(i).returnFromTime());
@@ -935,25 +892,6 @@ public class LMyProfile extends javax.swing.JFrame {
                     }
                 }  
             }
-            else{
-                for (int i = 0; i < chlist.size(); i++){
-                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnFromTime().equalsIgnoreCase(sinput)){
-                       Vector row = new Vector();
-                       row.add(chlist.get(i).returnDate());
-                       row.add(chlist.get(i).returnFromTime());
-                       row.add(chlist.get(i).returnToTime());
-                       row.add(chlist.get(i).returnVenue());
-                       row.add(chlist.get(i).returnStatus());
-                       row.add(chlist.get(i).returnStudentID());
-                       row.add(chlist.get(i).returnStudentName());
-                       row.add(chlist.get(i).returnStudentEmail());
-                       row.add(chlist.get(i).returnDegLevel());
-                       row.add(chlist.get(i).returnCourse());
-                       row.add(chlist.get(i).returnContact());
-                       model.addRow(row);
-                    }
-                }  
-            }
         }
         else if (scat == 3){
             if (cstatus == 0){
@@ -1013,25 +951,6 @@ public class LMyProfile extends javax.swing.JFrame {
                     }
                 }  
             }
-            else{
-                for (int i = 0; i < chlist.size(); i++){
-                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnVenue().equalsIgnoreCase(sinput)){
-                       Vector row = new Vector();
-                       row.add(chlist.get(i).returnDate());
-                       row.add(chlist.get(i).returnFromTime());
-                       row.add(chlist.get(i).returnToTime());
-                       row.add(chlist.get(i).returnVenue());
-                       row.add(chlist.get(i).returnStatus());
-                       row.add(chlist.get(i).returnStudentID());
-                       row.add(chlist.get(i).returnStudentName());
-                       row.add(chlist.get(i).returnStudentEmail());
-                       row.add(chlist.get(i).returnDegLevel());
-                       row.add(chlist.get(i).returnCourse());
-                       row.add(chlist.get(i).returnContact());
-                       model.addRow(row);
-                    }
-                }  
-            } 
         }
         else{
             if (cstatus == 0){
@@ -1075,25 +994,6 @@ public class LMyProfile extends javax.swing.JFrame {
             else if (cstatus == 2){
                 for (int i = 0; i < chlist.size(); i++){
                     if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
-                       Vector row = new Vector();
-                       row.add(chlist.get(i).returnDate());
-                       row.add(chlist.get(i).returnFromTime());
-                       row.add(chlist.get(i).returnToTime());
-                       row.add(chlist.get(i).returnVenue());
-                       row.add(chlist.get(i).returnStatus());
-                       row.add(chlist.get(i).returnStudentID());
-                       row.add(chlist.get(i).returnStudentName());
-                       row.add(chlist.get(i).returnStudentEmail());
-                       row.add(chlist.get(i).returnDegLevel());
-                       row.add(chlist.get(i).returnCourse());
-                       row.add(chlist.get(i).returnContact());
-                       model.addRow(row);
-                    }
-                }  
-            }
-            else{
-                for (int i = 0; i < chlist.size(); i++){
-                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
                        Vector row = new Vector();
                        row.add(chlist.get(i).returnDate());
                        row.add(chlist.get(i).returnFromTime());
@@ -1173,10 +1073,10 @@ public class LMyProfile extends javax.swing.JFrame {
         Calendar c = Calendar.getInstance();
         c.setTime(d);
         int dayoftheweek = c.get(Calendar.DAY_OF_WEEK);
-        if (dayoftheweek < 5) {
-            for (int i = 0; i < (5-dayoftheweek); i++) {
-                dateComboBox.addItem(sdf.format(c.getTime()).toString());
+        if (dayoftheweek < 6 && dayoftheweek > 2) {
+            for (int i = 0; i <= (5-dayoftheweek); i++) {
                 c.add(Calendar.DAY_OF_MONTH, 1);
+                dateComboBox.addItem(sdf.format(c.getTime()).toString());
             }
         }
         int week = c.get(Calendar.WEEK_OF_YEAR) + 1;
@@ -1441,12 +1341,8 @@ public class LMyProfile extends javax.swing.JFrame {
             sci = 1;
             loadDefinedCons(sci, si, ss);
         }
-        else if (statusComboBox.getSelectedIndex() == 2){
-            sci = 2;
-            loadDefinedCons(sci, si, ss);
-        }
         else{
-            sci = 3;
+            sci = 2;
             loadDefinedCons(sci, si, ss);
         }
     }//GEN-LAST:event_statusComboBoxActionPerformed

@@ -1,3 +1,6 @@
+L001,Koh Yun Jie,kohyunjie40@gmail.com,20/07/2019,1200,1230,A1,Available,-,-,-,-,-,-
+L001,Koh Yun Jie,kohyunjie40@gmail.com,22/07/2019,1200,1230,A1,Available,-,-,-,-,-,-
+L001,Koh Yun Jie,kohyunjie40@gmail.com,28/07/2019,1200,1230,A1,Available,-,-,-,-,-,-
 L001,Koh Yun Jie,kohyunjie40@gmail.com,31/07/2019,1200,1230,A1,Available,-,-,-,-,-,-
 L001,Koh Yun Jie,kohyunjie40@gmail.com,01/08/2019,1200,1230,A2,Booked,S001,Asley Tan,asley11@gmail.com,Year 2,Software Engineering,0164420075
 L001,Koh Yun Jie,kohyunjie40@gmail.com,02/08/2019,1000,1030,A3,Booked,S002,Lim Zi Le,zile99@hotmail.com,Year 2,Computer Science,0129766309
