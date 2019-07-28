@@ -5,9 +5,9 @@
  */
 package GUI;
 
-import UserRole.Lecturer;
-import UserRole.Student;
-import UserRole.Users;
+import MainClasses.Lecturer;
+import MainClasses.Student;
+import MainClasses.Users;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -143,17 +143,12 @@ public class Login extends javax.swing.JFrame {
         {
             File file = new File("./src/TextFiles/User.txt"); //. - go back one step
             Scanner sc = new Scanner(file);
-            ArrayList<String> list = new ArrayList<String>();
             
             while(sc.hasNextLine())
             {
-                list.add(sc.nextLine());
-            }
-            
-            for (int i = 0; i < list.size(); i++)
-            {
-                String tempstr[] = new String[8]; //for every i, new array is created, hence only one user details will be extracted at one time
-                tempstr = list.get(i).split(",");
+                
+                String tempstr[] = new String[8]; //when .hasNextLine() is true, new list is created, hence only one user details will be extracted at one time
+                tempstr = sc.nextLine().split(","); //split user details
                 
                 if (username.equals(tempstr[0]) && password.equals(tempstr[1])) 
                 {
@@ -178,7 +173,7 @@ public class Login extends javax.swing.JFrame {
         }
         catch(FileNotFoundException e)
         {
-            JOptionPane.showMessageDialog(rootPane, "An error has occured. Please try again.");
+            JOptionPane.showMessageDialog(rootPane, e);
         }
     }//GEN-LAST:event_loginButtonActionPerformed
 

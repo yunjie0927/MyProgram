@@ -1,0 +1,4 @@
+yunjie0927,yj9999,L001,Koh Yun Jie,kohyunjie40@gmail.com
+derron0517,ho1234,L002,Ho Derron,derron99@gmail.com
+asley0611,at000,S001,Asley Tan,asley11@gmail.com,Year 2,Software Engineering,0164420075
+zile,zile1231,S002,Lim Zi Le,zile99@hotmail.com,Year 2,Computer Science,0129766309

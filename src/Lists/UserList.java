@@ -5,8 +5,8 @@
  */
 package Lists;
 
-import UserRole.Lecturer;
-import UserRole.Student;
+import MainClasses.Lecturer;
+import MainClasses.Student;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -55,8 +55,7 @@ public class UserList {
         for (int i = 0; i < lecturerarr.size(); i++) {
             if (lecturerarr.get(i).returnUsername().equals(usn)) {
                  return lecturerarr.get(i);
-            }
-            
+            }  
         }
         return null;  
     }
@@ -66,14 +65,18 @@ public class UserList {
             if (studentarr.get(i).returnUsername().equals(usn)) {
                  return studentarr.get(i);
             }
-            
         }
         return null;  
     }
     
     public void saveList()throws FileNotFoundException{
-        PrintWriter pw = new PrintWriter(new File("./src/TextFiles/Text.txt"));
-        pw.println("Test");
+        PrintWriter pw = new PrintWriter(new File("./src/TextFiles/User.txt"));
+        for (int i = 0; i < lecturerarr.size(); i++){
+            pw.println(lecturerarr.get(i).returnUsername() + "," + lecturerarr.get(i).returnPassword() + "," + lecturerarr.get(i).returnID() + "," + lecturerarr.get(i).returnName() + "," + lecturerarr.get(i).returnEmail() + ",-,-,-");
+        }
+        for (int i = 0; i < studentarr.size(); i++){
+            pw.println(studentarr.get(i).returnUsername() + "," + studentarr.get(i).returnPassword() + "," + studentarr.get(i).returnID() + "," + studentarr.get(i).returnName() + "," + studentarr.get(i).returnEmail() + "," + studentarr.get(i).returnDegLevel() + "," + studentarr.get(i).returnCourse() + "," + studentarr.get(i).returnContact());
+        }
         pw.close();
     }
 }

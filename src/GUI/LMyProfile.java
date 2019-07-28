@@ -5,40 +5,90 @@
  */
 package GUI;
 
+import Lists.ConsultationList;
 import Lists.UserList;
-import UserRole.Lecturer;
-import UserRole.Student;
+import MainClasses.Consultation;
+import MainClasses.Lecturer;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author User
  */
 public class LMyProfile extends javax.swing.JFrame {
+    
     private Lecturer x;
-    private String tempusn;
+    private String tempun, temppswd;
+    private UserList userlist; 
+    private ConsultationList conslist;
+    private ArrayList<Consultation> chlist;
+    DefaultTableModel model;
+    private int sci; //status combo box index
+    private int si; //search combo box index
+    private String ss, firstselect = ""; //search string
+    private ArrayList<String> occupiedTime;
+    private String oldtime, oldvenue;
+    
     /**
      * Creates new form Profile
      */
     public LMyProfile(){
         initComponents();
-        tempusn = usernameTxt.getText();
-      
     }
     
     public LMyProfile(String un) throws FileNotFoundException{
         initComponents();
-        UserList userlist = new UserList();
+        panelAddNewCons.setVisible(false);
+        panelEditCons.setVisible(false);
+        userlist = new UserList();
+        conslist = new ConsultationList();
+        occupiedTime = new ArrayList<String>();
+        model= (DefaultTableModel)definedConsTable.getModel();
+        definedConsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        definedConsTable.getTableHeader().setReorderingAllowed(false);
+        definedConsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (definedConsTable.getSelectionModel().isSelectionEmpty()) {
+                    return;
+                }
+                int selectedRow = definedConsTable.getSelectedRow();
+                if (definedConsTable.getValueAt(selectedRow, 4).equals("Booked")){
+                    editButton.setEnabled(false);
+                    cancelButton.setText("Cancel Consultation");
+                }
+                else if (definedConsTable.getValueAt(selectedRow, 4).equals("Available")){
+                    editButton.setEnabled(true);
+                    cancelButton.setText("Delete Consultation");
+                }
+                else
+                {
+                    editButton.setEnabled(false);
+                    cancelButton.setText("Delete Consultation");
+                }
+            }
+        });
         x = userlist.getLecturerObject(un);
+        chlist = conslist.getConsultationList();
+        sci = 0;
+        ss = "";
         
-        idLabel.setText(x.returnID());
-        nameLabel.setText(x.returnName());
-        emailLabel.setText(x.returnEmail());
-        usernameTxt.setText(x.returnUsername());
-        passwordTxt.setText(x.returnPassword());
-        confirmTxt.setText(x.returnPassword());
+        loadMyProfile();
+        loadDefinedCons(0, 0, "");
     }
     
     
@@ -52,8 +102,8 @@ public class LMyProfile extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenu1 = new javax.swing.JMenu();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        panelMyProfile = new javax.swing.JPanel();
         profileLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -68,10 +118,48 @@ public class LMyProfile extends javax.swing.JFrame {
         emailLabel = new javax.swing.JLabel();
         passwordTxt = new javax.swing.JPasswordField();
         confirmTxt = new javax.swing.JPasswordField();
-
-        jMenu1.setText("jMenu1");
+        logoutButton = new javax.swing.JButton();
+        panelMyConsultation = new javax.swing.JPanel();
+        panelViewConsultation = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        definedConsTable = new javax.swing.JTable();
+        statusComboBox = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        searchTxt = new javax.swing.JTextField();
+        searchButton = new javax.swing.JButton();
+        editButton = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        searchComboBox = new javax.swing.JComboBox<>();
+        resetButton = new javax.swing.JButton();
+        panelAddNewCons = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        dateComboBox = new javax.swing.JComboBox<>();
+        fromTimeComboBox = new javax.swing.JComboBox<>();
+        toTimeLabel = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        venueComboBox = new javax.swing.JComboBox<>();
+        backButton = new javax.swing.JButton();
+        addConsButton = new javax.swing.JButton();
+        panelEditCons = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        dateLabel = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        newTimeComboBox = new javax.swing.JComboBox<>();
+        newVenueComboBox = new javax.swing.JComboBox<>();
+        jLabel18 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(2000, 1800));
+
+        jTabbedPane1.setPreferredSize(new java.awt.Dimension(786, 1082));
 
         profileLabel.setFont(new java.awt.Font("Elephant", 0, 24)); // NOI18N
         profileLabel.setText("My Profile");
@@ -101,123 +189,1521 @@ public class LMyProfile extends javax.swing.JFrame {
 
         emailLabel.setText("jLabel9");
 
+        logoutButton.setText("Log Out");
+        logoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelMyProfileLayout = new javax.swing.GroupLayout(panelMyProfile);
+        panelMyProfile.setLayout(panelMyProfileLayout);
+        panelMyProfileLayout.setHorizontalGroup(
+            panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMyProfileLayout.createSequentialGroup()
+                .addGap(394, 394, 394)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelMyProfileLayout.createSequentialGroup()
+                        .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(51, 51, 51)
+                        .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(usernameTxt)
+                            .addComponent(idLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(emailLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(passwordTxt)
+                            .addComponent(confirmTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelMyProfileLayout.createSequentialGroup()
+                        .addGap(137, 137, 137)
+                        .addComponent(profileLabel))
+                    .addGroup(panelMyProfileLayout.createSequentialGroup()
+                        .addGap(127, 127, 127)
+                        .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(logoutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(444, Short.MAX_VALUE))
+        );
+        panelMyProfileLayout.setVerticalGroup(
+            panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMyProfileLayout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(profileLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(idLabel))
+                .addGap(29, 29, 29)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(nameLabel))
+                .addGap(32, 32, 32)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(emailLabel))
+                .addGap(27, 27, 27)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(usernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(passwordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
+                .addGroup(panelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(confirmTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(logoutButton)
+                .addContainerGap(801, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("My Profile", panelMyProfile);
+
+        panelViewConsultation.setPreferredSize(new java.awt.Dimension(1178, 800));
+        panelViewConsultation.setSize(new java.awt.Dimension(100, 10));
+
+        definedConsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Date", "From", "To", "Venue", "Status", "Student ID", "Student Name", "Student Email", "Degree Level", "Course", "Contact"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(definedConsTable);
+
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Available", "Booked", "Overdue" }));
+        statusComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statusComboBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("Filter by:");
+
+        searchTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchTxtActionPerformed(evt);
+            }
+        });
+        searchTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchTxtKeyTyped(evt);
+            }
+        });
+
+        searchButton.setText("Search");
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
+        editButton.setText("Edit Consultation");
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+
+        addButton.setText("Add New Consultation");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+
+        cancelButton.setText("Cancel Consultation");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("Search by:");
+
+        searchComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Select-", "Date", "Time", "Venue", "Student Name" }));
+        searchComboBox.setMinimumSize(new java.awt.Dimension(113, 27));
+
+        resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelViewConsultationLayout = new javax.swing.GroupLayout(panelViewConsultation);
+        panelViewConsultation.setLayout(panelViewConsultationLayout);
+        panelViewConsultationLayout.setHorizontalGroup(
+            panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelViewConsultationLayout.createSequentialGroup()
+                .addGroup(panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelViewConsultationLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(addButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(editButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton))
+                    .addGroup(panelViewConsultationLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelViewConsultationLayout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 440, Short.MAX_VALUE)
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(resetButton)))))
+                .addContainerGap())
+        );
+        panelViewConsultationLayout.setVerticalGroup(
+            panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelViewConsultationLayout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addGroup(panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(searchTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchButton)
+                    .addComponent(jLabel8)
+                    .addComponent(searchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(resetButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelViewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cancelButton)
+                    .addComponent(editButton)
+                    .addComponent(addButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel9.setText("Date:");
+
+        jLabel10.setText("From Time:");
+
+        jLabel11.setText("To Time:");
+
+        jLabel12.setText("Duration:");
+
+        jLabel13.setText("Venue:");
+
+        dateComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dateComboBoxActionPerformed(evt);
+            }
+        });
+
+        fromTimeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Select-", "1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1530", "1600", "1630", "1700", "1730" }));
+        fromTimeComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fromTimeComboBoxActionPerformed(evt);
+            }
+        });
+
+        toTimeLabel.setText("hr/min");
+
+        jLabel15.setText("30 minutes");
+
+        venueComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Select-", "A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4" }));
+        venueComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                venueComboBoxActionPerformed(evt);
+            }
+        });
+
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
+        addConsButton.setText("Add");
+        addConsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addConsButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelAddNewConsLayout = new javax.swing.GroupLayout(panelAddNewCons);
+        panelAddNewCons.setLayout(panelAddNewConsLayout);
+        panelAddNewConsLayout.setHorizontalGroup(
+            panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                .addGap(462, 462, 462)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(backButton)
+                        .addGap(29, 29, 29)
+                        .addComponent(addConsButton))
+                    .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                        .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(toTimeLabel))
+                            .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel15))
+                            .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(dateComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(fromTimeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(venueComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelAddNewConsLayout.setVerticalGroup(
+            panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelAddNewConsLayout.createSequentialGroup()
+                .addGap(68, 68, 68)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(dateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(19, 19, 19)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(fromTimeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(23, 23, 23)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(toTimeLabel))
+                .addGap(33, 33, 33)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel15))
+                .addGap(30, 30, 30)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(venueComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(panelAddNewConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(backButton)
+                    .addComponent(addConsButton))
+                .addContainerGap(21, Short.MAX_VALUE))
+        );
+
+        jLabel14.setText("Date:");
+
+        dateLabel.setText("dd/MM/yyyy");
+
+        jLabel17.setText("Time:");
+
+        newTimeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Select-" }));
+        newTimeComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newTimeComboBoxActionPerformed(evt);
+            }
+        });
+
+        newVenueComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Select-" }));
+        newVenueComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newVenueComboBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel18.setText("Venue:");
+
+        jButton1.setText("Back");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Save");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelEditConsLayout = new javax.swing.GroupLayout(panelEditCons);
+        panelEditCons.setLayout(panelEditConsLayout);
+        panelEditConsLayout.setHorizontalGroup(
+            panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelEditConsLayout.createSequentialGroup()
+                .addGap(464, 464, 464)
+                .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelEditConsLayout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(52, 52, 52)
+                        .addComponent(jButton3))
+                    .addGroup(panelEditConsLayout.createSequentialGroup()
+                        .addComponent(jLabel14)
+                        .addGap(47, 47, 47)
+                        .addComponent(dateLabel))
+                    .addGroup(panelEditConsLayout.createSequentialGroup()
+                        .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel17)
+                            .addComponent(jLabel18))
+                        .addGap(28, 28, 28)
+                        .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(newTimeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(newVenueComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelEditConsLayout.setVerticalGroup(
+            panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelEditConsLayout.createSequentialGroup()
+                .addGap(75, 75, 75)
+                .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(dateLabel))
+                .addGap(28, 28, 28)
+                .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel17)
+                    .addComponent(newTimeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(24, 24, 24)
+                .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(newVenueComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel18))
+                .addGap(46, 46, 46)
+                .addGroup(panelEditConsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton3))
+                .addContainerGap(70, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout panelMyConsultationLayout = new javax.swing.GroupLayout(panelMyConsultation);
+        panelMyConsultation.setLayout(panelMyConsultationLayout);
+        panelMyConsultationLayout.setHorizontalGroup(
+            panelMyConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMyConsultationLayout.createSequentialGroup()
+                .addComponent(panelViewConsultation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
+            .addGroup(panelMyConsultationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelMyConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelAddNewCons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelEditCons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panelMyConsultationLayout.setVerticalGroup(
+            panelMyConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMyConsultationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelViewConsultation, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelAddNewCons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(panelEditCons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(85, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("My Consultation", panelMyConsultation);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(170, 170, 170)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(51, 51, 51)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(usernameTxt)
-                    .addComponent(idLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(emailLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(passwordTxt)
-                    .addComponent(confirmTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(199, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(profileLabel)
-                        .addGap(270, 270, 270))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(293, 293, 293))))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(profileLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(idLabel))
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(nameLabel))
-                .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(emailLabel))
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(usernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(passwordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(confirmTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41)
-                .addComponent(jButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        try{
-            UserList userlist = new UserList();
+    private void loadMyProfile(){
+        idLabel.setText(x.returnID());
+        nameLabel.setText(x.returnName());
+        emailLabel.setText(x.returnEmail());
+        usernameTxt.setText(x.returnUsername());
+        passwordTxt.setText(x.returnPassword());
+        confirmTxt.setText(x.returnPassword());
+        tempun = usernameTxt.getText();
+        temppswd = passwordTxt.getText();
+    }
+    
+    private void saveUpdatedDetails(){
+        if (usernameTxt.getText().trim().equals("") || passwordTxt.getText().trim().equals("")) { //any field empty
+            JOptionPane.showMessageDialog(rootPane, "Please ensure all details are filled.");
+            return;
+        }
+
+        
+        if (tempun.equals(usernameTxt.getText()) && temppswd.equals(passwordTxt.getText())) { //both not changed
+            JOptionPane.showMessageDialog(rootPane, "Nothing changed.");
+            return;
+        }
+        
+        Pattern ptrn = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE); //invalidate special characters
+        Matcher u = ptrn.matcher(usernameTxt.getText());
+        Matcher p = ptrn.matcher(passwordTxt.getText());
+        boolean a = u.find();
+        boolean b = p.find();
+        if (a || b){
+            JOptionPane.showMessageDialog(rootPane, "Special characters are not allowed.");
+            return;
+        }
+        
+        try {
+            // TODO add your handling code here:
+
             ArrayList<Lecturer> la = userlist.getLecturerList();
-            boolean c = true;
-            
-            if (!tempusn.equals(usernameTxt.getText())) {
-               for (int i = 0; i < la.size(); i++) {
-                if (la.get(i).returnUsername().equals(usernameTxt.getText())) {
-                    JOptionPane.showMessageDialog(rootPane, "Username exists.");
+
+            if (!tempun.equals(usernameTxt.getText())) { // if username changed
+                for (int i = 0; i < la.size(); i++) {
+                    if (la.get(i).returnUsername().equals(usernameTxt.getText())) { //check if the changed username has been used by another user
+                        JOptionPane.showMessageDialog(rootPane, "Username exists.");
+                        return;
+                    }
+                }
+            }
+
+            if (!temppswd.equals(passwordTxt.getText()) || !temppswd.equals(confirmTxt.getText())) { //if password has been changed
+                if (!confirmTxt.getText().equals(passwordTxt.getText())) { //check if the passwords match
+                    JOptionPane.showMessageDialog(rootPane, "Passwords do not match.");
                     return;
                 }
+            }
+
+            // INSERT WRITING METHOD HERE
+            x.setUsername(usernameTxt.getText());
+            x.setPassword(passwordTxt.getText());
+            userlist.saveList();
+            JOptionPane.showMessageDialog(rootPane, "Saved!");
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LMyProfile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    private void loadDefinedCons(int cstatus, int scat, String sinput){
+        model.setRowCount(0);
+        if (scat == 0){
+            if (cstatus == 0){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID())){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 1){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Available")){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 2){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked")){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else{
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue")){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+        }
+        else if (scat == 1){
+            if (cstatus == 0){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 1){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Available") && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 2){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else{
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnDate().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+        }
+        else if (scat == 2){
+            if (cstatus == 0){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnFromTime().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 1){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Available") && chlist.get(i).returnFromTime().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 2){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnFromTime().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else{
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnFromTime().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+        }
+        else if (scat == 3){
+            if (cstatus == 0){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnVenue().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 1){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Available") && chlist.get(i).returnVenue().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else if (cstatus == 2){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnVenue().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else{
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnVenue().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
             } 
+        }
+        else{
+            if (cstatus == 0){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
             }
-            
-            
-            
-            
-            
-            
-            
-            for (int i = 0; i < la.size(); i++){
-                if (!(usernameTxt.getText().equals(la.get(i).returnUsername()) && !x.returnID().equals(la.get(i).returnID()))){
-                    c = false;
-                }
+            else if (cstatus == 1){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Available") && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
             }
-            if (c == true){
-                if(passwordTxt.getText().equals(confirmTxt.getText()))
-                {
-                    x.setUsername(usernameTxt.getText());
-                    x.setPassword(passwordTxt.getText());
-                    userlist.saveList();
-                    JOptionPane.showMessageDialog(rootPane, "Saved!");
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(rootPane, "Unmatched password.");
-                }
-            }else{
-                JOptionPane.showMessageDialog(rootPane, "Username exists.");
+            else if (cstatus == 2){
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Booked") && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
+            }
+            else{
+                for (int i = 0; i < chlist.size(); i++){
+                    if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnStatus().equals("Overdue") && chlist.get(i).returnStudentName().equalsIgnoreCase(sinput)){
+                       Vector row = new Vector();
+                       row.add(chlist.get(i).returnDate());
+                       row.add(chlist.get(i).returnFromTime());
+                       row.add(chlist.get(i).returnToTime());
+                       row.add(chlist.get(i).returnVenue());
+                       row.add(chlist.get(i).returnStatus());
+                       row.add(chlist.get(i).returnStudentID());
+                       row.add(chlist.get(i).returnStudentName());
+                       row.add(chlist.get(i).returnStudentEmail());
+                       row.add(chlist.get(i).returnDegLevel());
+                       row.add(chlist.get(i).returnCourse());
+                       row.add(chlist.get(i).returnContact());
+                       model.addRow(row);
+                    }
+                }  
             }
         }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("Fail to write file.");
+    }
+    
+    private void cancelBookedCons(){
+        try{
+            int selectedRow = definedConsTable.getSelectedRow();
+            for (int i = 0; i < chlist.size(); i++){
+                if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equals(definedConsTable.getValueAt(selectedRow, 0)) && chlist.get(i).returnFromTime().equals(definedConsTable.getValueAt(selectedRow, 1)) && chlist.get(i).returnToTime().equals(definedConsTable.getValueAt(selectedRow, 2))){
+                    chlist.get(i).setStatus("Available");
+                    chlist.get(i).setStudentID("-");
+                    chlist.get(i).setStudentName("-");
+                    chlist.get(i).setStudentEmail("-");
+                    chlist.get(i).setDegLevel("-");
+                    chlist.get(i).setCourse("-");
+                    chlist.get(i).setContact("-");
+                }
+            }
+            loadDefinedCons(sci, si, ss);
+            JOptionPane.showMessageDialog(rootPane, "The consultation has been cancelled.");
+            conslist.saveConsultationList();
         }
+        catch (FileNotFoundException e){
+            System.out.println(e);
+        }
+    }
+    
+    private void deleteCons(){
+        try{
+            int selectedRow = definedConsTable.getSelectedRow();
+            for (int i = 0; i < chlist.size(); i++){
+                if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equals(definedConsTable.getValueAt(selectedRow, 0)) && chlist.get(i).returnFromTime().equals(definedConsTable.getValueAt(selectedRow, 1)) && chlist.get(i).returnToTime().equals(definedConsTable.getValueAt(selectedRow, 2))){
+                    chlist.remove(i);
+                    conslist.saveConsultationList();
+                }
+            }
+            loadDefinedCons(sci, si, ss);
+            JOptionPane.showMessageDialog(rootPane, "The consultation has been deleted.");
+            conslist.saveConsultationList();
+        }
+        catch (FileNotFoundException e){
+            System.out.println(e);
+        }
+    }
+    
+    private void loadAddNewCons(){
+        panelAddNewCons.setVisible(true);
+        panelViewConsultation.setVisible(false);
+        fromTimeComboBox.setSelectedIndex(0);
+        venueComboBox.setSelectedIndex(0);
+        toTimeLabel.setText("hr/min");
+        fromTimeComboBox.setSelectedIndex(0);
+        venueComboBox.setSelectedIndex(0);
+        
+        loadANCDate();
+        dateComboBox.setSelectedIndex(0);
+    }
+    
+    private void loadANCDate(){
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        int dayoftheweek = c.get(Calendar.DAY_OF_WEEK);
+        if (dayoftheweek < 5) {
+            for (int i = 0; i < (5-dayoftheweek); i++) {
+                dateComboBox.addItem(sdf.format(c.getTime()).toString());
+                c.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        }
+        int week = c.get(Calendar.WEEK_OF_YEAR) + 1;
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        
+        int i = 0;
+        do{
+            dateComboBox.addItem(sdf.format(c.getTime()).toString());
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            i++;
+        }while (i<5);
+    }
+    
+    private void loadANCTime(ArrayList<String> uw){
+        if (venueComboBox.getSelectedIndex() <= 0){
+            return;
+        }
+        
+        if (firstselect == "") {
+            firstselect = "venue";
+        } 
+        else if (firstselect == "time"){
+            return;
+        }
+        
+        ArrayList<String> unwanted = new ArrayList<String>();
+        
+        String[] temptime = {"1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1530", "1600", "1630", "1700", "1730"};
+        
+        for (int i = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnDate().equals(dateComboBox.getSelectedItem().toString()) && chlist.get(i).returnVenue().equals(venueComboBox.getSelectedItem().toString())){
+                unwanted.add(chlist.get(i).returnFromTime());
+            }
+        }
+        
+        fromTimeComboBox.removeAllItems();
+        fromTimeComboBox.addItem("-Select-");
+        for (int i = 0; i < temptime.length; i++){
+                Boolean add = true;
+                
+                for (int j = 0; j < unwanted.size(); j++){
+                    
+                    if (unwanted.get(j).equals(temptime[i])){
+                        add = false;
+                    }
+                }
+                
+                for (int k = 0; k < uw.size(); k++){
+                    if (uw.get(k).equals(temptime[i])){
+                        add = false;
+                    }
+                }
+                if (add){
+                    fromTimeComboBox.addItem(temptime[i]);
+                }
+        }
+    }
+    
+    private void loadANCVenue(){    
+        if (fromTimeComboBox.getSelectedIndex() <= 0){
+            return;
+        }
+        
+        if (firstselect == "") {//if user selects time first, venue will be filtered hence continue with the following codes
+            firstselect = "time";
+        } 
+        else if (firstselect == "venue"){ //if venue is selected first, time will be filtered, venue will be freezed hence the following code wont be executed
+            return;
+        }
+        
+        ArrayList<String> unwanted = new ArrayList<String>();
+        
+        String[] tempalphabet = {"A", "B", "C"};
+        
+        for (int i = 0; i < chlist.size(); i++) {
+            if (chlist.get(i).returnFromTime().equals(fromTimeComboBox.getSelectedItem().toString()) && chlist.get(i).returnDate().equals(dateComboBox.getSelectedItem().toString())) {
+                unwanted.add(chlist.get(i).returnVenue());
+            }
+        }
+        
+        venueComboBox.removeAllItems();
+        venueComboBox.addItem("-Select-");
+        for (int i = 0; i < tempalphabet.length; i++) {
+            for (int j = 1; j <= 4; j++) {
+                Boolean print = true;
+                
+                for (int k = 0; k < unwanted.size(); k++) {
+                    if (unwanted.get(k).equals(tempalphabet[i]+j)) {
+                         print = false;
+                    }
+                }
+                if (print) {
+                     venueComboBox.addItem(tempalphabet[i]+j);
+                } 
+            }
+        }
+    }
+    
+    
+    
+    private void loadEdit(String pdate, String ptime, String pvenue){
+        newTimeComboBox.removeAllItems();
+        newVenueComboBox.removeAllItems();
+        
+        dateLabel.setText(pdate);
+        oldtime = ptime;
+        oldvenue = pvenue;
+        
+        firstselect = "";
+        loadEditVenue();
+        occupiedTime.clear();
+        //newVenueComboBox.setSelectedIndex(0);
+        
+        String[] temptime = {"1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1530", "1600", "1630", "1700", "1730"};
+        
+        for (int i = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equals(dateLabel.getText())){
+                occupiedTime.add(chlist.get(i).returnFromTime());
+            } 
+        }
+
+        newTimeComboBox.removeAllItems();
+        newTimeComboBox.addItem(oldtime);
+        for (int i = 0; i < temptime.length; i++){
+                Boolean add = true;
+                
+                for (int j = 0; j < occupiedTime.size(); j++){ 
+                    if (occupiedTime.get(j).equals(temptime[i])){
+                        add = false;
+                    }
+                }
+                if (add){
+                    newTimeComboBox.addItem(temptime[i]);
+                }
+        }
+        loadEditTime(occupiedTime);
+        //newTimeComboBox.setSelectedIndex(0);
+
+    }
+    
+    private void loadEditTime(ArrayList<String> uw){
+        if (newVenueComboBox.getSelectedIndex() < 0){
+            return;
+        }
+        
+        if (firstselect == "") {
+            firstselect = "venue";
+        } 
+        else if (firstselect == "time"){
+            return;
+        }
+        
+        ArrayList<String> unwanted = new ArrayList<String>();
+        
+        String[] temptime = {"1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1530", "1600", "1630", "1700", "1730"};
+        
+        for (int i = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnDate().equals(dateLabel.getText()) && chlist.get(i).returnVenue().equals(newVenueComboBox.getSelectedItem().toString())){
+                unwanted.add(chlist.get(i).returnFromTime());
+            }
+        }
+        
+        newTimeComboBox.removeAllItems();
+        newTimeComboBox.addItem(oldtime);
+        for (int i = 0; i < temptime.length; i++){
+                Boolean add = true;
+                
+                for (int j = 0; j < unwanted.size(); j++){
+                    
+                    if (unwanted.get(j).equals(temptime[i])){
+                        add = false;
+                    }
+                }
+                
+                for (int k = 0; k < uw.size(); k++){
+                    if (uw.get(k).equals(temptime[i])){
+                        add = false;
+                    }
+                }
+                if (add){
+                    newTimeComboBox.addItem(temptime[i]);
+                }
+        }
+    }
+    
+    private void loadEditVenue(){
+        if (newTimeComboBox.getSelectedIndex() < 0){
+            return;
+        }
+
+        if (firstselect == ""){
+            firstselect = "time";
+        } 
+        else if (firstselect == "venue"){ 
+            return;
+        }
+        
+        ArrayList<String> unwanted = new ArrayList<String>();
+        
+        String[] tempalphabet = {"A", "B", "C"};
+        
+        for (int i = 0; i < chlist.size(); i++) {
+            if (chlist.get(i).returnFromTime().equals(newTimeComboBox.getSelectedItem().toString()) && chlist.get(i).returnDate().equals(dateLabel.getText())) {
+                unwanted.add(chlist.get(i).returnVenue());
+            }
+        }
+        
+        newVenueComboBox.removeAllItems();
+        newVenueComboBox.addItem(oldvenue);
+        for (int i = 0; i < tempalphabet.length; i++) {
+            for (int j = 1; j <= 4; j++) {
+                Boolean print = true;
+                
+                for (int k = 0; k < unwanted.size(); k++) {
+                    if (unwanted.get(k).equals(tempalphabet[i]+j)) {
+                         print = false;
+                    }
+                }
+                if (print) {
+                    if (!oldvenue.equals(tempalphabet[i]+j)){
+                        newVenueComboBox.addItem(tempalphabet[i]+j);
+                    }  
+                } 
+            }
+        }
+    }
+    
+    private void saveEdit(String olddate, String nft, String ntt, String nv) throws FileNotFoundException{
+        for (int i = 0; i < chlist.size(); i++) {
+            if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equals(olddate) && chlist.get(i).returnFromTime().equals(oldtime)){
+                chlist.get(i).setFromTime(nft);
+                chlist.get(i).setToTime(ntt);
+                chlist.get(i).setVenue(nv);
+                conslist.saveConsultationList();
+            }
+        }
+    }
+    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        saveUpdatedDetails();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        // TODO add your handling code here:
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Log out?");
+        if (dialogResult == JOptionPane.YES_OPTION){
+            Login login = new Login();
+            login.setVisible(true);
+            login.setLocationRelativeTo(null);
+            this.dispose();
+        }
+    }//GEN-LAST:event_logoutButtonActionPerformed
+
+    private void statusComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusComboBoxActionPerformed
+        // TODO add your handling code here:
+        if (statusComboBox.getSelectedIndex() == 0){
+            sci = 0;
+            loadDefinedCons(sci, si, ss);
+        }
+        else if (statusComboBox.getSelectedIndex() == 1){
+            sci = 1;
+            loadDefinedCons(sci, si, ss);
+        }
+        else if (statusComboBox.getSelectedIndex() == 2){
+            sci = 2;
+            loadDefinedCons(sci, si, ss);
+        }
+        else{
+            sci = 3;
+            loadDefinedCons(sci, si, ss);
+        }
+    }//GEN-LAST:event_statusComboBoxActionPerformed
+
+    private void searchTxtKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchTxtKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchTxtKeyTyped
+
+    private void searchTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchTxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchTxtActionPerformed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        // TODO add your handling code here:
+        if (searchComboBox.getSelectedIndex() == 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a category.");
+            return;
+        }
+        
+        if (searchTxt.getText().trim().equals("")){
+            JOptionPane.showMessageDialog(rootPane, "Do not leave the field empty.");
+            return;
+        }
+        
+        if (searchComboBox.getSelectedIndex() == 1){
+            si = 1;
+            ss = searchTxt.getText().replaceAll(" ","");
+            loadDefinedCons(sci, si, ss);
+        }
+        else if (searchComboBox.getSelectedIndex() == 2){
+            si = 2;
+            ss = searchTxt.getText().replaceAll(" ","");
+            loadDefinedCons(sci, si, ss);
+        }
+        else if (searchComboBox.getSelectedIndex() == 3){
+            si = 3;
+            ss = searchTxt.getText().replaceAll(" ","");
+            loadDefinedCons(sci, si, ss);
+        }
+        else{
+            si = 4;
+            ss = searchTxt.getText();
+            loadDefinedCons(sci, si, ss);
+        }
+    }//GEN-LAST:event_searchButtonActionPerformed
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        // TODO add your handling code here:
+        sci = 0;
+        si = 0;
+        ss = "";
+        statusComboBox.setSelectedIndex(0);
+        searchComboBox.setSelectedIndex(0);
+        searchTxt.setText("");
+        loadDefinedCons(sci, si, ss);
+    }//GEN-LAST:event_resetButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        // TODO add your handling code here:
+        if (definedConsTable.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(rootPane, "Please select a consultation.");
+            return;
+        }
+        
+        if (cancelButton.getText().equals("Cancel Consultation")){
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Cancel the booked consultation?");
+            if (dialogResult == JOptionPane.YES_OPTION){
+                cancelBookedCons();
+            }
+        }
+        else if (cancelButton.getText().equals("Delete Consultation")){
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Delete the consultation?");
+            if (dialogResult == JOptionPane.YES_OPTION){
+                deleteCons();
+            }
+        }
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        // TODO add your handling code here:
+        loadAddNewCons();
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        // TODO add your handling code here:
+        panelAddNewCons.setVisible(false);
+        panelViewConsultation.setVisible(true);
+        statusComboBox.setSelectedIndex(0);
+        searchComboBox.setSelectedIndex(0);
+        searchTxt.setText("");
+        loadDefinedCons(0, 0, "");
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void dateComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateComboBoxActionPerformed
+        // TODO add your handling code here:
+        firstselect = "";
+        loadANCVenue();
+        venueComboBox.setSelectedIndex(0);
+        occupiedTime.clear();
+        
+        String[] temptime = {"1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1530", "1600", "1630", "1700", "1730"};
+        
+        for (int i = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnLecturerID().equals(x.returnID()) && chlist.get(i).returnDate().equals(dateComboBox.getSelectedItem().toString()) ){
+                occupiedTime.add(chlist.get(i).returnFromTime());
+            }  
+        }
+
+        fromTimeComboBox.removeAllItems();
+        fromTimeComboBox.addItem("-Select-");
+        for (int i = 0; i < temptime.length; i++){
+                Boolean add = true;
+                
+                for (int j = 0; j < occupiedTime.size(); j++){
+                    if (occupiedTime.get(j).equals(temptime[i])){
+                        add = false;
+                        break;
+                    }
+                }
+                if (add){
+                    fromTimeComboBox.addItem(temptime[i]);
+                }
+                
+
+        }
+        loadANCTime(occupiedTime);
+        fromTimeComboBox.setSelectedIndex(0);
+    }//GEN-LAST:event_dateComboBoxActionPerformed
+
+    private void fromTimeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fromTimeComboBoxActionPerformed
+        if (fromTimeComboBox.getSelectedIndex() <= 0) {
+            return;
+        }
+        
+        loadANCVenue();
+        
+        if (fromTimeComboBox.getItemAt(fromTimeComboBox.getSelectedIndex()).equals("-Select-")){
+            toTimeLabel.setText("hr/min");
+            return;
+        }
+        String ft = fromTimeComboBox.getItemAt(fromTimeComboBox.getSelectedIndex());
+        
+        int temphr = Integer.parseInt(ft.substring(0,2));
+        String tempmin = ft.substring(2,4);
+        
+        if (tempmin.equals("00")){
+            tempmin = "30";
+        }
+        else if (tempmin.equals("30")){
+            tempmin = "00";
+            temphr = temphr + 1;
+        }
+        
+        toTimeLabel.setText(temphr + tempmin);
+    }//GEN-LAST:event_fromTimeComboBoxActionPerformed
+
+    private void addConsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addConsButtonActionPerformed
+        // TODO add your handling code here:
+        if (fromTimeComboBox.getSelectedIndex() <= 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a time.");
+            return;
+        }
+        
+        if (venueComboBox.getSelectedIndex() <= 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a venue.");
+            return;
+        }
+        
+//       String ft = fromTimeComboBox.getItemAt(fromTimeComboBox.getSelectedIndex());
+        
+//        int temphr = Integer.parseInt(ft.substring(0,2));
+//        String tempmin = ft.substring(2,4);
+//        
+//        if (tempmin.equals("00")){
+//            tempmin = "30";
+//        }
+//        else if (tempmin.equals("30")){
+//            tempmin = "00";
+//            temphr = temphr + 1;
+//        }
+        
+        chlist.add(new Consultation(x.returnID(), x.returnName(), x.returnEmail(), dateComboBox.getItemAt(dateComboBox.getSelectedIndex()), fromTimeComboBox.getItemAt(fromTimeComboBox.getSelectedIndex()), toTimeLabel.getText(), venueComboBox.getItemAt(venueComboBox.getSelectedIndex()), "Available", "-", "-", "-", "-", "-", "-"));
+        try {
+            conslist.saveConsultationList();
+            JOptionPane.showMessageDialog(rootPane, "New consultation added.");
+            loadAddNewCons();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LMyProfile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_addConsButtonActionPerformed
+
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        // TODO add your handling code here:
+        if (definedConsTable.getSelectedRow() < 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a consultation.");
+            return;
+        }
+        panelViewConsultation.setVisible(false);
+        panelEditCons.setVisible(true);
+        loadEdit((String) definedConsTable.getValueAt(definedConsTable.getSelectedRow(), 0), (String) definedConsTable.getValueAt(definedConsTable.getSelectedRow(), 1), (String) definedConsTable.getValueAt(definedConsTable.getSelectedRow(), 3));
+    }//GEN-LAST:event_editButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        panelEditCons.setVisible(false);
+        panelViewConsultation.setVisible(true);
+        loadDefinedCons(0, 0, "");
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void venueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_venueComboBoxActionPerformed
+        // TODO add your handling code here:
+        loadANCTime(occupiedTime);
+    }//GEN-LAST:event_venueComboBoxActionPerformed
+
+    private void newTimeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newTimeComboBoxActionPerformed
+        // TODO add your handling code here:
+       loadEditVenue();
+    }//GEN-LAST:event_newTimeComboBoxActionPerformed
+
+    private void newVenueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newVenueComboBoxActionPerformed
+        // TODO add your handling code here:
+        loadEditTime(occupiedTime);
+    }//GEN-LAST:event_newVenueComboBoxActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Save changes?");
+        
+        try{
+            if (dialogResult == JOptionPane.YES_OPTION){
+                String newvenue = newVenueComboBox.getSelectedItem().toString();
+                
+                String ft = newTimeComboBox.getSelectedItem().toString();
+        
+                int temphr = Integer.parseInt(ft.substring(0,2));
+                String tempmin = ft.substring(2,4);
+
+                if (tempmin.equals("00")){
+                    tempmin = "30";
+                }
+                else if (tempmin.equals("30")){
+                    tempmin = "00";
+                    temphr = temphr + 1;
+                }
+           
+                
+                saveEdit(dateLabel.getText(), ft, temphr + tempmin, newvenue);
+                JOptionPane.showMessageDialog(rootPane, "Saved!");
+                panelEditCons.setVisible(false);
+                panelViewConsultation.setVisible(true);
+                loadDefinedCons(0,0, "");
+            } 
+        }
+        catch (FileNotFoundException e){
+            System.out.println("File not found.");
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,21 +1744,58 @@ public class LMyProfile extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
+    private javax.swing.JButton addConsButton;
+    private javax.swing.JButton backButton;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JPasswordField confirmTxt;
+    private javax.swing.JComboBox<String> dateComboBox;
+    private javax.swing.JLabel dateLabel;
+    private javax.swing.JTable definedConsTable;
+    private javax.swing.JButton editButton;
     private javax.swing.JLabel emailLabel;
+    private javax.swing.JComboBox<String> fromTimeComboBox;
     private javax.swing.JLabel idLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton logoutButton;
     private javax.swing.JLabel nameLabel;
+    private javax.swing.JComboBox<String> newTimeComboBox;
+    private javax.swing.JComboBox<String> newVenueComboBox;
+    private javax.swing.JPanel panelAddNewCons;
+    private javax.swing.JPanel panelEditCons;
+    private javax.swing.JPanel panelMyConsultation;
+    private javax.swing.JPanel panelMyProfile;
+    private javax.swing.JPanel panelViewConsultation;
     private javax.swing.JPasswordField passwordTxt;
     private javax.swing.JLabel profileLabel;
+    private javax.swing.JButton resetButton;
+    private javax.swing.JButton searchButton;
+    private javax.swing.JComboBox<String> searchComboBox;
+    private javax.swing.JTextField searchTxt;
+    private javax.swing.JComboBox<String> statusComboBox;
+    private javax.swing.JLabel toTimeLabel;
     private javax.swing.JTextField usernameTxt;
+    private javax.swing.JComboBox<String> venueComboBox;
     // End of variables declaration//GEN-END:variables
 }

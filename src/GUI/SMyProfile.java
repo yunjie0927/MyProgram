@@ -5,11 +5,21 @@
  */
 package GUI;
 
+import Lists.ConsultationList;
 import Lists.UserList;
-import UserRole.Student;
+import MainClasses.Consultation;
+import MainClasses.Lecturer;
+import MainClasses.Student;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,26 +27,37 @@ import javax.swing.JOptionPane;
  */
 public class SMyProfile extends javax.swing.JFrame {
     private Student y;
+    private String tempun, temppswd, tempctc;
+    private UserList userlist;
+    private ConsultationList conslist;
+    private ArrayList<Consultation> chlist;
+    private ArrayList<Lecturer> ls;
+    private ArrayList<Student> sa;
+    private DefaultTableModel model1, model2;
+    
     /**
      * Creates new form SMyProfile
      */
-    public SMyProfile(){
-        initComponents();
+    public SMyProfile() throws FileNotFoundException{
+        initComponents();     
     }
     
     public SMyProfile(String un) throws FileNotFoundException{
         initComponents();
-        UserList userlist = new UserList();
+        jPanelBookNewConsultation.setVisible(false);
+        userlist = new UserList();
+        conslist = new ConsultationList();
         y = userlist.getStudentObject(un);
-        idLabel.setText(y.returnID());
-        nameLabel.setText(y.returnName());
-        emailLabel.setText(y.returnEmail());
-        degreeLabel.setText(y.returnDegLevel());
-        courseLabel.setText(y.returnCourse());
-        contactTxt.setText(y.returnContact());
-        usernameTxt.setText(y.returnUsername());
-        passwordTxt.setText(y.returnPassword());
-        confirmTxt.setText(y.returnPassword());
+        chlist = conslist.getConsultationList();
+        model1 = (DefaultTableModel)tbBookedCons.getModel();
+        model2 = (DefaultTableModel)definedConsTable.getModel();
+        tbBookedCons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbBookedCons.getTableHeader().setReorderingAllowed(false);
+        definedConsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        definedConsTable.getTableHeader().setReorderingAllowed(false);
+        
+        loadMyProfile();
+        loadViewBookedCons();
     }
 
     /**
@@ -48,40 +69,53 @@ public class SMyProfile extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        passwordTxt = new javax.swing.JPasswordField();
-        jLabel2 = new javax.swing.JLabel();
-        confirmTxt = new javax.swing.JPasswordField();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        jTabbedPane = new javax.swing.JTabbedPane();
+        jPanelMyProfile = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
+        courseLabel = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         usernameTxt = new javax.swing.JTextField();
+        contactTxt = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         idLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         nameLabel = new javax.swing.JLabel();
+        passwordTxt = new javax.swing.JPasswordField();
         profileLabel = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         emailLabel = new javax.swing.JLabel();
+        confirmTxt = new javax.swing.JPasswordField();
         jLabel7 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         degreeLabel = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        courseLabel = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        contactTxt = new javax.swing.JTextField();
+        logoutButton = new javax.swing.JButton();
+        jPanelMyConsultation = new javax.swing.JPanel();
+        jPanelViewBookedConsultation = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbBookedCons = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jPanelBookNewConsultation = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        lecturerComboBox = new javax.swing.JComboBox<>();
+        searchButton = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        definedConsTable = new javax.swing.JTable();
+        bookButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("ID:");
-
-        jLabel2.setText("Name:");
-
-        jLabel3.setText("Email:");
-
-        jLabel4.setText("Username:");
-
         jLabel5.setText("Password:");
 
+        courseLabel.setText("jLabel10");
+
         jLabel6.setText("Confirm Password:");
+
+        jLabel11.setText("Contact:");
 
         jButton2.setText("Save Change");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -92,36 +126,43 @@ public class SMyProfile extends javax.swing.JFrame {
 
         idLabel.setText("jLabel7");
 
+        jLabel1.setText("ID:");
+
         nameLabel.setText("jLabel8");
 
         profileLabel.setFont(new java.awt.Font("Elephant", 0, 24)); // NOI18N
         profileLabel.setText("My Profile");
 
+        jLabel2.setText("Name:");
+
         emailLabel.setText("jLabel9");
 
         jLabel7.setText("Degree Level:");
 
+        jLabel3.setText("Email:");
+
         degreeLabel.setText("jLabel8");
+
+        jLabel4.setText("Username:");
 
         jLabel9.setText("Course:");
 
-        courseLabel.setText("jLabel10");
+        logoutButton.setText("Log Out");
+        logoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutButtonActionPerformed(evt);
+            }
+        });
 
-        jLabel11.setText("Contact:");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(180, 180, 180)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(profileLabel)
-                        .addGap(157, 157, 157))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelMyProfileLayout = new javax.swing.GroupLayout(jPanelMyProfile);
+        jPanelMyProfile.setLayout(jPanelMyProfileLayout);
+        jPanelMyProfileLayout.setHorizontalGroup(
+            jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMyProfileLayout.createSequentialGroup()
+                .addGap(221, 221, 221)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMyProfileLayout.createSequentialGroup()
+                        .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel7)
                             .addComponent(jLabel1)
                             .addComponent(jLabel9)
@@ -132,107 +173,521 @@ public class SMyProfile extends javax.swing.JFrame {
                             .addComponent(jLabel6)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(idLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(emailLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(degreeLabel)
-                            .addComponent(courseLabel)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(contactTxt, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(usernameTxt, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(passwordTxt, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(confirmTxt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(68, 68, 68)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 210, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(168, 168, 168))
+                                .addComponent(confirmTxt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(degreeLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(courseLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(idLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(emailLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanelMyProfileLayout.createSequentialGroup()
+                        .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelMyProfileLayout.createSequentialGroup()
+                                .addGap(96, 96, 96)
+                                .addComponent(profileLabel))
+                            .addGroup(jPanelMyProfileLayout.createSequentialGroup()
+                                .addGap(87, 87, 87)
+                                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(248, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
+        jPanelMyProfileLayout.setVerticalGroup(
+            jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMyProfileLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addComponent(profileLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(idLabel))
                 .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(nameLabel))
                 .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(emailLabel))
                 .addGap(33, 33, 33)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(degreeLabel))
                 .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(courseLabel))
                 .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(contactTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(usernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(passwordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelMyProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(confirmTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(51, 51, 51)
                 .addComponent(jButton2)
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(logoutButton)
+                .addContainerGap(391, Short.MAX_VALUE))
+        );
+
+        jTabbedPane.addTab("My Profile", jPanelMyProfile);
+
+        tbBookedCons.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Lecturer ID", "Lecturer Name", "Lecturer Email", "Date", "From", "To", "Venue"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tbBookedCons);
+
+        jButton3.setText("Cancel Consultation");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Book New Consultation");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelViewBookedConsultationLayout = new javax.swing.GroupLayout(jPanelViewBookedConsultation);
+        jPanelViewBookedConsultation.setLayout(jPanelViewBookedConsultationLayout);
+        jPanelViewBookedConsultationLayout.setHorizontalGroup(
+            jPanelViewBookedConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelViewBookedConsultationLayout.createSequentialGroup()
+                .addContainerGap(379, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 753, Short.MAX_VALUE)
+        );
+        jPanelViewBookedConsultationLayout.setVerticalGroup(
+            jPanelViewBookedConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelViewBookedConsultationLayout.createSequentialGroup()
+                .addContainerGap(18, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelViewBookedConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton4)
+                    .addComponent(jButton3))
+                .addContainerGap())
+        );
+
+        jLabel8.setText("Please select a lecturer:");
+
+        lecturerComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Select--" }));
+
+        searchButton.setText("Search");
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
+        definedConsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Lecturer ID", "Lecturer Name", "Lecturer Email", "Date", "From", "To", "Venue", "Status"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(definedConsTable);
+
+        bookButton.setText("Book Consultation");
+        bookButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelBookNewConsultationLayout = new javax.swing.GroupLayout(jPanelBookNewConsultation);
+        jPanelBookNewConsultation.setLayout(jPanelBookNewConsultationLayout);
+        jPanelBookNewConsultationLayout.setHorizontalGroup(
+            jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                .addGroup(jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jScrollPane3))
+                    .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                        .addGroup(jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                                .addGap(245, 245, 245)
+                                .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(59, 59, 59)
+                                .addComponent(bookButton))
+                            .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lecturerComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchButton)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelBookNewConsultationLayout.setVerticalGroup(
+            jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelBookNewConsultationLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lecturerComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelBookNewConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(backButton)
+                    .addComponent(bookButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanelMyConsultationLayout = new javax.swing.GroupLayout(jPanelMyConsultation);
+        jPanelMyConsultation.setLayout(jPanelMyConsultationLayout);
+        jPanelMyConsultationLayout.setHorizontalGroup(
+            jPanelMyConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMyConsultationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanelViewBookedConsultation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanelMyConsultationLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jPanelBookNewConsultation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanelMyConsultationLayout.setVerticalGroup(
+            jPanelMyConsultationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMyConsultationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanelViewBookedConsultation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelBookNewConsultation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("My Consultation", jPanelMyConsultation);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void loadMyProfile(){
+        idLabel.setText(y.returnID());
+        nameLabel.setText(y.returnName());
+        emailLabel.setText(y.returnEmail());
+        degreeLabel.setText(y.returnDegLevel());
+        courseLabel.setText(y.returnCourse());
+        contactTxt.setText(y.returnContact());
+        usernameTxt.setText(y.returnUsername());
+        passwordTxt.setText(y.returnPassword());
+        confirmTxt.setText(y.returnPassword());
+        tempun = usernameTxt.getText();
+        temppswd = passwordTxt.getText();
+        tempctc = contactTxt.getText();
+    }
+    
+    private void loadViewBookedCons(){
+        model1.setRowCount(0);
+        for (int i = 0; i < chlist.size(); i++){
+           if (chlist.get(i).returnStudentID().equals(y.returnID())){
+               Vector row = new Vector();
+               row.add(chlist.get(i).returnLecturerID());
+               row.add(chlist.get(i).returnLecturerName());
+               row.add(chlist.get(i).returnLecturerEmail());
+               row.add(chlist.get(i).returnDate());
+               row.add(chlist.get(i).returnFromTime());
+               row.add(chlist.get(i).returnToTime());
+               row.add(chlist.get(i).returnVenue());
+               model1.addRow(row);
+           }
+        }  
+    }
+    
+    private void loadBookNewCons(){
+        while (lecturerComboBox.getItemCount() != 1){
+            lecturerComboBox.removeItemAt(1);
+        }
+        model2.setRowCount(0);
+        ls = userlist.getLecturerList();
+        for (int i = 0; i < ls.size(); i++){
+            lecturerComboBox.addItem(ls.get(i).returnName());
+        }
+    }
+    
+    private void displayAvailableCons(){
+        model2.setRowCount(0);
+        
+        if (lecturerComboBox.getSelectedIndex() == 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a lecturer to view available consultation hours.");
+            return;
+        }
+        
+        int selectedLecturer = lecturerComboBox.getSelectedIndex();
+        for (int i  = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnLecturerName().equals(lecturerComboBox.getItemAt(selectedLecturer)) && chlist.get(i).returnStatus().equals("Available")){
+               Vector row = new Vector();
+               row.add(chlist.get(i).returnLecturerID());
+               row.add(chlist.get(i).returnLecturerName());
+               row.add(chlist.get(i).returnLecturerEmail());
+               row.add(chlist.get(i).returnDate());
+               row.add(chlist.get(i).returnFromTime());
+               row.add(chlist.get(i).returnToTime());
+               row.add(chlist.get(i).returnVenue());
+               row.add(chlist.get(i).returnStatus());
+               model2.addRow(row);
+           }
+        } 
+         
+    }
+    
+    private void saveUpdatedDetails(){
+        if (usernameTxt.getText().trim().equals("") || passwordTxt.getText().trim().equals("") || contactTxt.getText().trim().equals("")) { //any field empty
+            JOptionPane.showMessageDialog(rootPane, "Please ensure all details are filled.");
+            return;
+        }
+        
+        if (usernameTxt.getText().equals(tempun) && passwordTxt.getText().equals(temppswd) && contactTxt.getText().equals(tempctc)){ //nothing changed
+            JOptionPane.showMessageDialog(rootPane, "Nothing changed.");
+            return;
+        }
+        
+        Pattern ptrn = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher u = ptrn.matcher(usernameTxt.getText());
+        Matcher p = ptrn.matcher(passwordTxt.getText());
+        Matcher c = ptrn.matcher(contactTxt.getText());
+        boolean a = u.find();
+        boolean b = p.find();
+        boolean d = c.find();
+        if (a || b || d){
+            JOptionPane.showMessageDialog(rootPane, "Special characters are not allowed.");
+            return;
+        }
+        
+        try {
+            
+            sa = userlist.getStudentList();
+            
+            if (!usernameTxt.getText().equals(tempun)){ //if username changed
+                for (int i = 0; i < sa.size (); i++){
+                    if (sa.get(i).returnUsername().equals(usernameTxt.getText())){ //but has been used by other user
+                        JOptionPane.showMessageDialog(rootPane, "Username exists.");
+                        return;
+                    }
+                }
+            }
+            
+            if(!passwordTxt.getText().equals(temppswd) || !confirmTxt.getText().equals(temppswd)){ //if passwords changed
+                if(!passwordTxt.getText().equals(confirmTxt.getText())){ //but do not match
+                    JOptionPane.showMessageDialog(rootPane, "Passwords do not match.");
+                    return;
+                }
+            }
+            
+            y.setUsername(usernameTxt.getText());
+            y.setPassword(passwordTxt.getText());
+            y.setContact(contactTxt.getText());
+            userlist.saveList();
+            JOptionPane.showMessageDialog(rootPane, "Saved!");
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(SMyProfile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    private void cancelBookedCons(){
+        try{
+            int selectedRow = tbBookedCons.getSelectedRow();
+            for (int i = 0; i < chlist.size(); i++){
+                if (chlist.get(i).returnLecturerID().equals(tbBookedCons.getValueAt(selectedRow, 0)) && chlist.get(i).returnDate().equals(tbBookedCons.getValueAt(selectedRow, 3)) && chlist.get(i).returnFromTime().equals(tbBookedCons.getValueAt(selectedRow, 4)) && chlist.get(i).returnToTime().equals(tbBookedCons.getValueAt(selectedRow, 5))){
+                    chlist.get(i).setStatus("Available");
+                    chlist.get(i).setStudentID("-");
+                    chlist.get(i).setStudentName("-");
+                    chlist.get(i).setStudentEmail("-");
+                    chlist.get(i).setDegLevel("-");
+                    chlist.get(i).setCourse("-");
+                    chlist.get(i).setContact("-");
+                    
+                }
+            }
+            model1.removeRow(selectedRow);
+            JOptionPane.showMessageDialog(rootPane, "The consultation has been cancelled.");
+            conslist.saveConsultationList();
+        }
+        catch (FileNotFoundException e){
+            System.out.println(e);
+        }
+    }
+    
+    private void bookConsultation() throws FileNotFoundException{
+        int selectedRow = definedConsTable.getSelectedRow();
+        for (int i = 0; i < chlist.size(); i++){
+            if (chlist.get(i).returnLecturerID().equals(definedConsTable.getValueAt(selectedRow, 0)) && chlist.get(i).returnDate().equals(definedConsTable.getValueAt(selectedRow, 3)) && chlist.get(i).returnFromTime().equals(definedConsTable.getValueAt(selectedRow, 4)) && chlist.get(i).returnToTime().equals(definedConsTable.getValueAt(selectedRow, 5))){
+                chlist.get(i).setStatus("Booked");
+                chlist.get(i).setStudentID(y.returnID());
+                chlist.get(i).setStudentName(y.returnName());
+                chlist.get(i).setStudentEmail(y.returnEmail());
+                chlist.get(i).setDegLevel(y.returnDegLevel());
+                chlist.get(i).setCourse(y.returnCourse());
+                chlist.get(i).setContact(y.returnContact());
+            }
+        }
+        model2.removeRow(selectedRow);
+        JOptionPane.showMessageDialog(rootPane, "The consultation has been booked.");
+        conslist.saveConsultationList();
+    }
+    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        try{
-            UserList userlist = new UserList();
-            ArrayList<Student> la = userlist.getStudentList();
-            boolean c = true;
-            for (int i = 0; i < la.size(); i++){
-                if (usernameTxt.getText().equals(la.get(i).returnUsername())
-                        && !y.returnID().equals(la.get(i).returnID())){
-                    c = false;
-                }
-            }
-            if (c == true){
-                if(passwordTxt.getText().equals(confirmTxt.getText()))
-                {
-                    y.setUsername(usernameTxt.getText());
-                    y.setPassword(passwordTxt.getText());
-                    y.setContact(contactTxt.getText());
-                    //save to file
-                    JOptionPane.showMessageDialog(rootPane, "Saved!");
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(rootPane, "Unmatched password.");
-                }
-            }
-            else{
-                JOptionPane.showMessageDialog(rootPane, "Username exists.");
-            }
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("Fail to write file.");
-        }
+        saveUpdatedDetails();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        if (tbBookedCons.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(rootPane, "No booked consultation is selected.");
+            return;
+        }
+        
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Cancel the booked consultation?");
+        if (dialogResult == JOptionPane.YES_OPTION){
+            cancelBookedCons();
+        } 
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        jPanelViewBookedConsultation.setVisible(false);
+        jPanelBookNewConsultation.setVisible(true);
+        loadBookNewCons();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        // TODO add your handling code here:
+        jPanelViewBookedConsultation.setVisible(true);
+        loadViewBookedCons();
+        jPanelBookNewConsultation.setVisible(false);
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        // TODO add your handling code here:
+        displayAvailableCons();
+    }//GEN-LAST:event_searchButtonActionPerformed
+
+    private void bookButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookButtonActionPerformed
+        // TODO add your handling code here:
+        if(definedConsTable.getRowCount() == 0){
+            JOptionPane.showMessageDialog(rootPane, "Please select a lecturer to book consultation.");
+            return;
+        }
+        
+        if(definedConsTable.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(rootPane, "Please select a consultation slot.");
+            return;
+        }
+        
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Confirm to book the consultation?");
+        
+        try{
+            if (dialogResult == JOptionPane.YES_OPTION){
+            bookConsultation();
+            } 
+        }
+        catch (FileNotFoundException e){
+            System.out.println("File not found.");
+        }
+    }//GEN-LAST:event_bookButtonActionPerformed
+
+    private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        // TODO add your handling code here:
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Log out?");
+        if (dialogResult == JOptionPane.YES_OPTION){
+            Login login = new Login();
+            login.setVisible(true);
+            login.setLocationRelativeTo(null);
+            this.dispose();
+        }
+    }//GEN-LAST:event_logoutButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -264,19 +719,28 @@ public class SMyProfile extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SMyProfile().setVisible(true);
+                try {
+                    new SMyProfile().setVisible(true);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(SMyProfile.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
+    private javax.swing.JButton bookButton;
     private javax.swing.JPasswordField confirmTxt;
     private javax.swing.JTextField contactTxt;
     private javax.swing.JLabel courseLabel;
+    private javax.swing.JTable definedConsTable;
     private javax.swing.JLabel degreeLabel;
     private javax.swing.JLabel emailLabel;
     private javax.swing.JLabel idLabel;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
@@ -285,10 +749,22 @@ public class SMyProfile extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanelBookNewConsultation;
+    private javax.swing.JPanel jPanelMyConsultation;
+    private javax.swing.JPanel jPanelMyProfile;
+    private javax.swing.JPanel jPanelViewBookedConsultation;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JComboBox<String> lecturerComboBox;
+    private javax.swing.JButton logoutButton;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JPasswordField passwordTxt;
     private javax.swing.JLabel profileLabel;
+    private javax.swing.JButton searchButton;
+    private javax.swing.JTable tbBookedCons;
     private javax.swing.JTextField usernameTxt;
     // End of variables declaration//GEN-END:variables
 }
